@@ -16,6 +16,7 @@ use App\Entity\Post;
 use App\Entity\User;
 use App\Event\CommentCreatedEvent;
 use App\Form\CommentType;
+use App\Message\CommentCreatedMessage;
 use App\Repository\PostRepository;
 use App\Repository\TagRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,6 +26,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -110,6 +112,7 @@ final class BlogController extends AbstractController
         Request $request,
         #[MapEntity(mapping: ['postSlug' => 'slug'])] Post $post,
         EventDispatcherInterface $eventDispatcher,
+        MessageBusInterface $messageBus,
         EntityManagerInterface $entityManager,
     ): Response {
         $comment = new Comment();
@@ -132,7 +135,8 @@ final class BlogController extends AbstractController
             // If you prefer to process comments asynchronously (e.g. to perform some
             // heavy tasks on them) you can use the Symfony Messenger component.
             // See https://symfony.com/doc/current/messenger.html
-            $eventDispatcher->dispatch(new CommentCreatedEvent($comment));
+            // $eventDispatcher->dispatch(new CommentCreatedEvent($comment));
+            $messageBus->dispatch(new CommentCreatedMessage($comment));
 
             return $this->redirectToRoute('blog_post', ['slug' => $post->getSlug()], Response::HTTP_SEE_OTHER);
         }

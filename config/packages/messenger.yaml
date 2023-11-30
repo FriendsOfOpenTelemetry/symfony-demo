@@ -1,0 +1,24 @@
+framework:
+    messenger:
+        failure_transport: failed
+
+        transports:
+            # https://symfony.com/doc/current/messenger.html#transport-configuration
+            # The trace(...) decorator injects/extracts the OpenTelemetry traceparent across the process boundary.
+            async: 'trace(%env(MESSENGER_TRANSPORT_DSN)%)'
+            failed: 'trace(doctrine://default?queue_name=failed)'
+            sync: 'trace(sync://default)'
+
+        routing:
+            'App\Message\*': async
+        buses:
+            messenger.bus.default:
+              middleware:
+                - open_telemetry_tracer
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                async: 'in-memory://'
+                failed: 'in-memory://'

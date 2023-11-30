@@ -3,6 +3,10 @@
 
 .php-version
 
+.idea
+.data
+data/
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -26,3 +30,5 @@
 ###> phpstan/phpstan ###
 phpstan.neon
 ###< phpstan/phpstan ###
+
+/build/
