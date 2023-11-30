@@ -4,7 +4,7 @@ on:
     pull_request:
     push:
         branches:
-            - main
+            - opentelemetry-bundle
 
 env:
     fail-fast: true
@@ -39,7 +39,7 @@ jobs:
               uses: shivammathur/setup-php@v2
               with:
                   coverage: "none"
-                  extensions: "intl, mbstring, pdo_sqlite, zip"
+                  extensions: "intl, mbstring, pdo_sqlite, zip, opentelemetry"
                   php-version: ${{ matrix.php-version }}
                   tools: composer:v2
 

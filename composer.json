@@ -1,8 +1,8 @@
 {
-    "name": "symfony/symfony-demo",
+    "name": "friendsofopentelemetry/symfony-demo",
     "license": "MIT",
     "type": "project",
-    "description": "Symfony Demo Application",
+    "description": "Symfony Demo Application with OpenTelemetry Bundle",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "replace": {
@@ -15,12 +15,15 @@
     },
     "require": {
         "php": ">=8.2",
+        "ext-opentelemetry": "*",
         "ext-pdo_sqlite": "*",
         "doctrine/dbal": "^4.0",
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.0",
-        "league/commonmark": "^2.1",
+        "friendsofopentelemetry/opentelemetry-bundle": "*",
+        "league/commonmark": "^2.4",
+        "open-telemetry/exporter-otlp": "^1.0",
         "symfony/apache-pack": "^1.0",
         "symfony/asset": "^7",
         "symfony/asset-mapper": "^7",
@@ -34,6 +37,7 @@
         "symfony/http-client": "^7",
         "symfony/intl": "^7",
         "symfony/mailer": "^7",
+        "symfony/messenger": "^7",
         "symfony/monolog-bundle": "^3.7",
         "symfony/polyfill-intl-messageformatter": "^1.12",
         "symfony/runtime": "^7",
@@ -68,8 +72,10 @@
     },
     "config": {
         "allow-plugins": {
+            "php-http/discovery": false,
             "symfony/flex": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "tbachert/spi": false
         },
         "platform": {
             "php": "8.2.0"
@@ -104,6 +110,9 @@
         ]
     },
     "extra": {
+        "exclude-from-files": [
+            "open-telemetry/*"
+        ],
         "symfony": {
             "allow-contrib": true,
             "require": "7.2.*"
