@@ -1,7 +1,10 @@
 monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
-
+    handlers:
+      open_telemetry:
+        type: service
+        id: 'open_telemetry.logs.monolog.handlers.main'
 when@dev:
     monolog:
         handlers:

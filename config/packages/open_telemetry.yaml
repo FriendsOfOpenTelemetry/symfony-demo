@@ -1,0 +1,86 @@
+open_telemetry:
+  service:
+    namespace: 'FriendsOfOpenTelemetry'
+    name: 'Symfony Demo app'
+    version: '0.0.0'
+    environment: '%kernel.environment%'
+  instrumentation:
+    cache:
+      tracing:
+        enabled: true
+    console:
+      tracing:
+        enabled: true
+    doctrine:
+      tracing:
+        enabled: true
+    http_client:
+      tracing:
+        enabled: true
+    http_kernel:
+      tracing:
+        enabled: true
+    mailer:
+      tracing:
+        enabled: true
+    messenger:
+      tracing:
+        enabled: true
+    twig:
+      tracing:
+        enabled: true
+  traces:
+    tracers:
+      main:
+        provider: 'open_telemetry.traces.providers.default'
+    providers:
+      default:
+        type: default
+        sampler: always_on
+        processors:
+          - 'open_telemetry.traces.processors.otlp'
+    processors:
+      otlp:
+        type: simple
+        exporter: 'open_telemetry.traces.exporters.otlp'
+      console:
+        type: simple
+        exporter: 'open_telemetry.traces.exporters.console'
+    exporters:
+      otlp:
+        dsn: http+otlp://localhost:4318
+      console:
+        dsn: stream+console://default
+  metrics:
+    meters:
+      main:
+        provider: 'open_telemetry.metrics.providers.default'
+    providers:
+      default:
+        type: default
+        exporter: 'open_telemetry.metrics.exporters.otlp'
+    exporters:
+      otlp:
+        dsn: http+otlp://localhost:4318
+      console:
+        dsn: stream+console://default
+  logs:
+    monolog:
+      enabled: true
+      handlers:
+        main:
+          provider: 'open_telemetry.logs.providers.default'
+    loggers:
+      main:
+        provider: 'open_telemetry.logs.providers.default'
+    providers:
+      default:
+        type: default
+        processor: 'open_telemetry.logs.processors.default'
+    processors:
+      default:
+        type: simple
+        exporter: 'open_telemetry.logs.exporters.otlp'
+    exporters:
+      otlp:
+        dsn: http+otlp://localhost:4318
