@@ -1,0 +1,76 @@
+version: '3.8'
+networks:
+  demo:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.42.0/24
+# https://github.com/grafana/tempo/tree/main/example/docker-compose/otel-collector
+# https://github.com/grafana/loki/tree/main/examples/getting-started
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    restart: always
+    command: ["--config=/etc/otel-collector.yaml"]
+    volumes:
+      - ./docker/otel-collector.yaml:/etc/otel-collector.yaml:ro
+    networks:
+      - demo
+    ports:
+      - "1888:1888" # pprof extension
+      - "8888:8888" # Prometheus metrics exposed by the collector http://localhost:8888/metrics
+      - "8889:8889" # Prometheus exporter metrics http://localhost:8889/metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP HTTP receiver
+      - "55679:55679" # zpages extension
+  prometheus:
+    image: prom/prometheus:latest
+    restart: always
+    command:
+      - --config.file=/etc/prometheus/prometheus.yaml
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+    volumes:
+      - ./docker/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+    networks:
+      - demo
+    ports:
+      - "9090:9090" # http://localhost:9090
+  tempo:
+    image: grafana/tempo:latest
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./docker/tempo.yaml:/etc/tempo.yaml:ro
+      - ./var/tempo:/tmp/tempo
+    networks:
+      - demo
+    ports:
+      - "3200" # tempo
+      - "4317" # otlp grpc
+      - "4318" # otlp http
+  loki:
+    image: grafana/loki:latest
+    networks:
+      - demo
+    ports:
+      - "3100"
+    command: -config.file=/etc/loki/local-config.yaml
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./docker/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    networks:
+      - demo
+    ports:
+      - "3000:3000" # http://localhost:3000/explore
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

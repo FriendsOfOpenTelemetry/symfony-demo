@@ -1,0 +1,10 @@
+otel_sdk:
+  enabled: true
+  resource:
+    attributes:
+      service.name: "OpenTelemetry OtelSdkBundle Demo app"
+  trace:
+    enabled: true
+    exporters:
+      - type: otlp
+        url: http://localhost:4318/v1/traces

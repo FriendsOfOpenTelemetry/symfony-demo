@@ -17,4 +17,5 @@ return [
     Symfony\UX\LiveComponent\LiveComponentBundle::class => ['all' => true],
     Symfony\UX\StimulusBundle\StimulusBundle::class => ['all' => true],
     Symfonycasts\SassBundle\SymfonycastsSassBundle::class => ['all' => true],
+    OpenTelemetry\Contrib\Symfony\OtelSdkBundle\OtelSdkBundle::class => ['all' => true],
 ];
